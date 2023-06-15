@@ -18,6 +18,86 @@ class Empresa(db.Model):
     descricao_empresa = db.Column(db.Text)
     objetivos_principais = db.Column(db.Text)
     historico_interacoes = db.Column(db.Text)
+    vincular_instagram = db.Column(db.String(200))
+
+
+
+
+
+class PostInstagram(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_empresa = db.Column(db.String(64), index=True)
+    timestamp = db.Column(db.String(64))
+    caption = db.Column(db.String(64))
+    like_count = db.Column(db.Integer)
+    comments_count = db.Column(db.Integer)
+    reach = db.Column(db.Integer)
+    percentage = db.Column(db.Float)
+    media_product_type = db.Column(db.String(64))
+    plays = db.Column(db.Integer)
+    saved = db.Column(db.Integer)
+    nome_empresa = db.Column(db.String(64))
+
+    def to_dicts(self):
+        return {
+            'id': self.id,  # incluir o id no dicionário
+            'id_empresa': self.id_empresa,
+            'timestamp': self.timestamp,
+            'caption': self.caption,
+            'like_count': self.like_count,
+            'comments_count': self.comments_count,
+            'reach': self.reach,
+            'percentage': self.percentage,
+            'media_product_type': self.media_product_type,
+            'plays': self.plays,
+            'saved': self.saved,
+            'nome_empresa': self.nome_empresa,
+        }
+    
+class PostsInstagram(db.Model):
+    id = db.Column(db.String, primary_key=True)
+    id_empresa = db.Column(db.String(64), index=True)
+    timestamp = db.Column(db.String(64))
+    caption = db.Column(db.String(64))
+    like_count = db.Column(db.Integer)
+    comments_count = db.Column(db.Integer)  
+    reach = db.Column(db.Integer)
+    percentage = db.Column(db.Float)
+    media_product_type = db.Column(db.String(64))
+    plays = db.Column(db.Integer)
+    saved = db.Column(db.Integer)
+    nome_empresa = db.Column(db.String(64))
+
+    def to_dict(self):
+        return {
+            'id': self.id,  # incluir o id no dicionário
+            'id_empresa': self.id_empresa,
+            'timestamp': self.timestamp,
+            'caption': self.caption,
+            'like_count': self.like_count,
+            'comments_count': self.comments_count,
+            'reach': self.reach,
+            'percentage': self.percentage,
+            'media_product_type': self.media_product_type,
+            'plays': self.plays,
+            'saved': self.saved,
+            'nome_empresa': self.nome_empresa,
+        }
+
+class AnaliseInstagram(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data_criacao = db.Column(db.String(64))
+    analise = db.Column(db.Text)
+    nome_empresa = db.Column(db.String(64))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'data_criacao': self.data_criacao,
+            'analise': self.analise,
+            'nome_empresa': self.nome_empresa,
+        }
+    
 
 
 
@@ -52,7 +132,13 @@ class Usuario(db.Model, UserMixin):
     dayling_5 = db.Column(db.String(200))
     password_hash = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False)
-
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'sobrenome': self.sobrenome,
+            'email': self.email,
+        }
     @property
     def password(self):
         raise AttributeError('password: campo de leitura apenas')
