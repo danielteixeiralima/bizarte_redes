@@ -68,6 +68,29 @@
           
   }
 
+  async function saveAnaliseToServer() {
+    var analise = JSON.parse(localStorage.getItem('analise'));
+    var empresa = document.getElementById('empresa').value;
+
+    // Crie um objeto FormData para segurar os dados da análise
+    var formData = new FormData();
+    formData.append('data_criacao', new Date().toISOString());
+    formData.append('analise', JSON.stringify(analise));
+    formData.append('nome_empresa', empresa);
+  
+    // Faça a solicitação POST para o servidor
+    let response = await fetch('/api/salvar_analise', {
+      method: 'POST',
+      body: formData
+    });
+  
+    if (response.ok) {
+      console.log('Análise enviada com sucesso para o servidor');
+    } else {
+      console.log('Erro ao enviar a análise para o servidor:', response.status, response.statusText);
+    }
+  }
+
   function analisarPosts() {
     var empresa = document.getElementById('empresa').value;
     fetch('/api/analise_posts?empresa=' + empresa)
@@ -76,7 +99,10 @@
             // Armazena a análise no localStorage para que possa ser acessada na próxima página
             localStorage.setItem('analise', JSON.stringify(data));
             // Navega para a página de visualização de análises
+            saveAnaliseToServer();
             window.location.href = '/visualizar_analises';
+
+            
         });
   }
   

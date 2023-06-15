@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from models import db, Empresa, Resposta, Usuario, OKR, KR, PostsInstagram
+from models import db, Empresa, Resposta, Usuario, OKR, KR, PostsInstagram, AnaliseInstagram
 import requests
 import json
 import time
@@ -19,16 +19,20 @@ import requests
 import json
 from datetime import datetime, timedelta
 import dateparser
-
-
+from flask_mail import Mail, Message
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
 
 app = Flask(__name__)
 app.secret_key = 'Omega801'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'test.db')
 migrate = Migrate(app, db)
+
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'danieltl@poli.ufrj.br'  # Substitua pelo seu email
+app.config['MAIL_PASSWORD'] = '118167419'  # Substitua pela sua senha
 
 
 db.init_app(app)
@@ -93,6 +97,17 @@ def api_posts():
     posts = [post.to_dict() for post in posts]  # Convert each post to a dictionary
     return jsonify(posts)
 
+@app.route('/api/analises', methods=['GET'])
+def api_analises():
+    empresa_selecionada = request.args.get('empresa')
+    if empresa_selecionada:
+        analises = AnaliseInstagram.query.filter(AnaliseInstagram.nome_empresa == empresa_selecionada).order_by(desc(AnaliseInstagram.data_criacao)).all()
+    else:
+        analises = AnaliseInstagram.query.order_by(desc(AnaliseInstagram.data_criacao)).all()
+
+    analises = [analise.to_dict() for analise in analises]  # Convert each analise to a dictionary
+    return jsonify(analises)
+
 @app.route('/api/analise_posts')
 def api_analise_posts():
     empresa = request.args.get('empresa')
@@ -100,7 +115,120 @@ def api_analise_posts():
     print(analise)
     return jsonify(analise)
 
+@app.route('/api/empresa/<int:id>/usuarios', methods=['GET'])
+def get_users(id):
+    users = Usuario.query.filter_by(id_empresa=id).all()
+    return jsonify([user.to_dict() for user in users])
 
+@app.route('/api/send_whatsapp/<id>/<user_id>', methods=['POST'])
+def send_whatsapp(id, user_id):
+    try:
+        print(f"Sending whatsapp for analysis ID: {id}")
+        # Locate the analysis by id
+        analise = AnaliseInstagram.query.get(id)
+
+        if analise is None:
+            print(f"Analysis not found for ID: {id}")
+            return jsonify({'error': 'Analysis not found'}), 404
+
+        # Locate the user by id
+        user = Usuario.query.get(user_id)
+
+        if user is None:
+            print(user)
+            print(f"User not found for ID: {user_id}")
+            return jsonify({'error': 'User not found'}), 404
+
+        whatsapp_to = user.celular
+        whatsapp_message = analise.analise
+
+        headers = {
+            'Authorization': 'Bearer EAAEKuYkpbtsBAD4zieqbSSw3JeyeFULHWlvHTzHuGoKAZBd0l120H0PAZAXF0rzXoGpyTXcrgwwLHsAzwr6qHtWypJ2lBI8zNqGbvVSVF0IcnpLS7cuCLFRwKGpgCDHZCQZAk6rjawKc5U4ZCaYYSebGBMe4j6JjtpPOjnikQ9oep9VhlMzhieXCjOKOzf2S2ddSEtiHEEAZDZD',
+            'Content-Type': 'application/json'
+        }
+        
+        body = {
+            "messaging_product": "whatsapp",
+            "to": "5521964802282",
+            "type": "template",
+            "template": {
+                "name": "envios_analises",
+                "language": {
+                    "code": "pt_BR"
+                },
+                "components": [
+                    {
+                        "type": "header",
+                        "parameters": [
+                            {
+                                "type": "text",
+                                "text": user.nome + ' ' + user.sobrenome
+                            }
+                        ]
+                    },
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {
+                                "type": "text",
+                                "text": "Análise teste 123"
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        
+       
+
+        response = requests.post('https://graph.facebook.com/v17.0/112868715169108/messages', headers=headers, data=json.dumps(body))
+
+        print("Full response from Facebook API:")
+        print(response.text)
+        if response.status_code != 200:
+            return jsonify({'error': 'Failed to send WhatsApp message'}), 500
+
+        
+
+        return jsonify({'message': 'WhatsApp message sent'}), 200
+    except Exception as e:
+        print("Exception occurred: ", str(e))
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.route('/api/send_email/<id>/<user_id>', methods=['POST'])
+def send_email(id, user_id):
+    try:
+        print(f"Sending email for analysis ID: {id}")
+        # Localize a análise por id
+        analise = AnaliseInstagram.query.get(id)
+
+        if analise is None:
+            print(f"Analysis not found for ID: {id}")
+            return jsonify({'error': 'Analysis not found'}), 404
+
+        # Localize o usuário por id
+        user = Usuario.query.get(user_id)
+
+        if user is None:
+            print(user)
+            print(f"User not found for ID: {user_id}")
+            return jsonify({'error': 'User not found'}), 404
+
+        email_to = user.email
+        email_subject = 'Assunto do E-mail'
+        email_body = f'Análise: {analise.analise}'
+        mail = Mail(app)
+        msg = Message(email_subject,
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[email_to],
+                      body=email_body)
+
+        mail.send(msg)
+        print(f"Email sent to: {email_to}")
+
+        return jsonify({'message': 'Email sent'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/verificar_post_existente', methods=['POST'])
 def verificar_post_existente():
@@ -272,7 +400,23 @@ def analise_posts():
     return render_template('analise_posts.html', empresas=empresas)
 
 
-
+@app.route('/api/salvar_analise', methods=['POST'])
+def salvar_analise():
+    try:
+        if request.method == 'POST':
+            analise = AnaliseInstagram(
+                id=request.form.get('id'),
+                nome_empresa=request.form.get('nome_empresa'),
+                data_criacao=request.form.get('data_criacao'),
+                analise=request.form.get('analise'),
+            )
+            db.session.add(analise)
+            db.session.commit()
+            
+    except Exception as e:
+        print("Exceção ocorreu: ", e)
+        traceback.print_exc()
+        return jsonify({'message': 'Falha ao salvar análise!'}), 500
 
    
 
@@ -280,7 +424,7 @@ def get_last_15_days_posts(empresa):
     # Substitua esta lógica pelo código necessário para obter os posts dos últimos 15 dias
     posts = PostsInstagram.query.filter(PostsInstagram.nome_empresa == empresa).order_by(PostsInstagram.timestamp.desc()).limit(15).all()
 
-    print(posts)
+    #print(posts)
     # Converter os objetos Post em dicionários
     posts_dict = [post.to_dict() for post in posts]
 
@@ -362,7 +506,7 @@ def perguntar_gpt(pergunta, pergunta_id, messages):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": ""
+        "Authorization": "Bearer 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"
     }
 
     # Adiciona a pergunta atual
@@ -420,7 +564,7 @@ def visualizar_planejamento_atual(id_empresa):
 def visualizar_analises():
     nome_empresa = request.args.get('empresa')
     analise = analise_post_instagram(nome_empresa)
-    return render_template('visualizar_analises.html', analise=analise)
+    return render_template('listar_analises.html', analise=analise)
 
 @app.route('/cadastrar/okr', methods=['GET', 'POST'])
 def cadastrar_okr():
@@ -463,7 +607,7 @@ def atualizar_okr(id):
 
 
 def analise_post_instagram(nome_empresa):
-    print('Análise de Post Instagram')
+    #print('Análise de Post Instagram')
 
     # Obter os posts dos últimos 15 dias
     posts = get_last_15_days_posts(nome_empresa)
@@ -471,7 +615,7 @@ def analise_post_instagram(nome_empresa):
         print('Posts não encontrados.')
         return
 
-    print(f"Posts para a empresa de ID: {nome_empresa}")
+    #print(f"Posts para a empresa de ID: {nome_empresa}")
 
     todos_posts_str = ""
     for i, post in enumerate(posts, start=1):
@@ -493,8 +637,8 @@ def analise_post_instagram(nome_empresa):
     #print(pergunta)
 
     resposta_gpt, _ = perguntar_gpt(pergunta=pergunta, pergunta_id=1, messages=[])
-    
-    print(resposta_gpt)
+        
+    #print(resposta_gpt)
 
     return resposta_gpt
 

@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lista de Análises</title>
+  <style>
+    .styled-table td {
+      white-space: pre-line;
+    }
+  </style>
+</head>
+<body>
+  <br><br>
+  <button id="carregar-analises" onclick="getAnalises()">Carregar Análises</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data de Criação</th>
+        <th>Análise</th>
+        <th>Nome da Empresa</th>
+        <th>Envios</th>
+      </tr>
+    </thead>
+    <tbody id="analise-table-body" class="styled-table">
+      {% for analise in analises %}
+      <tr>
+          <td>{{ analise.data_criacao }}</td>
+          <td>{{ analise.analise|replace('\n', '<br>') }}</td>
+          <td>{{ analise.nome_empresa }}</td>
+          <td>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#whatsAppModal" data-id="{{ analise.id }}" onclick="currentAnaliseId = this.getAttribute('data-id'); openModalWhatsApp();">Whatsapp</button>
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#emailModal" data-id="{{ analise.id }}" onclick="currentAnaliseId = this.getAttribute('data-id'); openModalEmail();">E-mail</button>
+          </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Modal de Envio de WhatsApp -->
+  <div class="modal fade" id="whatsAppModal" tabindex="-1" role="dialog" aria-labelledby="whatsAppModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="whatsAppModalLabel">Enviar Análise por WhatsApp</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="whatsAppForm">
+            <div class="form-group">
+              <label for="clientsSelect">Clientes</label>
+              <select class="form-control" id="clientsSelect"></select>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="sendWhatsApp()">Enviar Mensagem</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Envio de Email -->
+  <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="emailModalLabel">Enviar Análise por Email</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="emailForm">
+            <div class="form-group">
+              <label for="colaboradoresSelect">Colaboradores</label>
+              <select class="form-control" id="colaboradoresSelect" multiple></select>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="sendEmail()">Enviar Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+      appId      : '293266963132123',
+      cookie     : true,
+      xfbml      : false,
+      version    : 'v17.0',
+      });
+    }
+
+    let currentAnaliseId;
+
+    document.getElementById('carregar-analises').addEventListener('click', getAnalises);
+
+    function getAnalises() {
+        fetch('/api/analises')
+            .then(response => response.json())
+            .then(data => populateTable(data));
+    }
+
+    function sendWhatsApp() {
+      var selectedUsers = Array.from(document.getElementById('clientsSelect').selectedOptions).map(option => option.value);
+      for (var i = 0; i < selectedUsers.length; i++) {
+          fetch(`/api/send_whatsapp/${currentAnaliseId}/${selectedUsers[i]}`, {method: 'POST'})
+              .then(response => {
+                  if (!response.ok) {
+                      throw Error(response.statusText);
+                  }
+                  return response.json();
+              })
+              .then(data => console.log(data))
+              .catch(error => console.log('Error: ' + error));
+      }
+  }
+
+  function sendEmail() {
+    var selectedUsers = Array.from(document.getElementById('colaboradoresSelect').selectedOptions).map(option => option.value);
+    for (var i = 0; i < selectedUsers.length; i++) {
+        fetch(`/api/send_email/${currentAnaliseId}/${selectedUsers[i]}`, {method: 'POST'})
+            .then(response => {
+                if (!response.ok) {
+                    throw Error(response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => console.log(data))
+            .catch(error => console.log('Error: ' + error));
+    }
+}
+
+    function openModalWhatsApp() {
+        fetch(`/api/empresa/${currentAnaliseId}/usuarios`)
+            .then(response => {
+                if (!response.ok) {
+                    throw Error(response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                var select = document.getElementById('clientsSelect');
+                select.innerHTML = '';
+                data.forEach(function(client) {
+                    var opt = document.createElement('option');
+                    opt.value = client.id;
+                    opt.innerHTML = client.nome + ' ' + client.sobrenome;
+                    select.appendChild(opt);
+                });
+                $('#whatsAppModal').modal('show');
+            })
+            .catch(error => console.log('Error: ' + error));
+    }
+
+    function openModal() {
+      fetch(`/api/empresa/${currentAnaliseId}/usuarios`)
+          .then(response => {
+              if (!response.ok) {
+                  throw Error(response.statusText);
+              }
+              return response.json();
+          })
+          .then(data => {
+              var select = document.getElementById('colaboradoresSelect');
+              select.innerHTML = '';
+              data.forEach(function(user) {
+                  var opt = document.createElement('option');
+                  opt.value = user.id;
+                  opt.innerHTML = user.nome + ' ' + user.sobrenome;
+                  select.appendChild(opt);
+              });
+              $('#emailModal').modal('show');
+          })
+          .catch(error => console.log('Error: ' + error));
+  }
+
+    function populateTable(data) {
+      var tbody = document.getElementById('analise-table-body');
+      tbody.innerHTML = '';
+
+      for (var i = 0; i < data.length; i++) {
+          var tr = document.createElement('tr');
+          var fields = ['data_criacao', 'analise', 'nome_empresa'];
+          for (var j = 0; j < fields.length; j++) {
+              var td = document.createElement('td');
+              if (fields[j] === 'analise') {
+                  td.innerHTML = data[i][fields[j]].replace(/\n/g, '<br>');
+              } else {
+                  td.textContent = data[i][fields[j]];
+              }
+              tr.appendChild(td);
+          }
+
+          var td = document.createElement('td');
+          var buttonWhatsapp = document.createElement('button');
+          buttonWhatsapp.type = 'button';
+          buttonWhatsapp.className = 'btn btn-primary';
+          buttonWhatsapp.textContent = 'Whatsapp';
+          buttonWhatsapp.setAttribute('data-id', data[i].id);
+          buttonWhatsapp.onclick = function () { 
+                currentAnaliseId = this.getAttribute('data-id');
+                openModalWhatsApp();
+            };
+
+          var buttonEmail = document.createElement('button');
+          buttonEmail.type = 'button';
+          buttonEmail.className = 'btn btn-secondary';
+          buttonEmail.textContent = 'E-mail';
+          buttonEmail.setAttribute('data-toggle', 'modal');
+          buttonEmail.setAttribute('data-target', '#emailModal');
+          buttonEmail.setAttribute('data-id', data[i].id);
+          buttonEmail.onclick = function () { 
+                currentAnaliseId = this.getAttribute('data-id'); 
+                openModal();
+            };
+
+          td.appendChild(buttonWhatsapp);
+          td.appendChild(buttonEmail);
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+      }
+  }
+
+    
+
+    
+  </script>
+{% endblock %}

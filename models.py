@@ -15,8 +15,7 @@ class Empresa(db.Model):
     descricao_empresa = db.Column(db.Text)
     objetivos_principais = db.Column(db.Text)
     historico_interacoes = db.Column(db.Text)
-    vincular_instagram = db.Column(db.String(200)) 
-    
+    vincular_instagram = db.Column(db.String(200))
 
 
 class Resposta(db.Model):
@@ -46,6 +45,13 @@ class Usuario(db.Model):
     dayling_3 = db.Column(db.String(200))  # Novo campo
     dayling_4 = db.Column(db.String(200))  # Novo campo
     dayling_5 = db.Column(db.String(200))  # Novo campo
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'sobrenome': self.sobrenome,
+            'email': self.email,
+        }
 
 class OKR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -122,5 +128,19 @@ class PostsInstagram(db.Model):
             'media_product_type': self.media_product_type,
             'plays': self.plays,
             'saved': self.saved,
+            'nome_empresa': self.nome_empresa,
+        }
+
+class AnaliseInstagram(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    data_criacao = db.Column(db.String(64))
+    analise = db.Column(db.Text)
+    nome_empresa = db.Column(db.String(64))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'data_criacao': self.data_criacao,
+            'analise': self.analise,
             'nome_empresa': self.nome_empresa,
         }
