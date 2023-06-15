@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Lista de Tarefas por Usuário</h1>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Usuário</th>
+                <th>Tarefas</th>
+                <th>Data de Criação</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.nome }}</td>
+                    <td>
+                        {% for sprint in usuario.sprints %}
+                            {{ sprint.tarefa }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for sprint in usuario.sprints %}
+                            {{ sprint.data_criacao }}<br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('montar_tarefas_semana', usuario_id=usuario.id) }}" class="btn btn-primary">Montar Tarefas da Semana</a>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#emailModal" data-usuario="{{ usuario.id }}">Enviar Email</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Enviar Email</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="emailContent">
+                    <!-- O conteúdo do email será inserido aqui pelo JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="sendEmailButton">Enviar Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

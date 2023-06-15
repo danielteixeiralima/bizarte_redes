@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <form method="POST">
+        <label for="empresa_id">Selecione a empresa:</label>
+        <select name="empresa_id" id="empresa_id">
+            {% for empresa in empresas %}
+                <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">OK</button>
+    </form>
+{% endblock %}

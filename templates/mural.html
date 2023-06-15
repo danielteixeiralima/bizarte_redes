@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        .postit {
+            width: 200px;
+            height: 200px;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid black;
+            border-radius: 10px;
+            touch-action: none;
+            user-select: none;
+        }
+        .green {
+            background-color: lightgreen;
+        }
+        .blue {
+            background-color: lightblue;
+        }
+        .orange {
+            background-color: orange;
+        }
+        .yellow {
+            background-color: yellow;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .objetivo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .kr {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.11/dist/interact.min.js"></script>
+</head>
+<body>
+    <button onclick="window.location.href='/'">Voltar</button>
+    <div class="container" id="postitContainer">
+        {% for objetivo in objetivos %}
+        <div class="objetivo">
+            <div class="postit green" ondblclick="editPostit(this)">
+                <h2>Objetivo</h2>
+                <p>{{ objetivo.objetivo }}</p>
+            </div>
+            {% for kr in krs %}
+            <div class="kr">
+                <div class="postit blue" ondblclick="editPostit(this)">
+                    <h2>Key Result</h2>
+                    <p>{{ kr.texto }}</p>
+                </div>
+                {% for macro_acao in macro_acoes %}
+                <div class="postit orange" ondblclick="editPostit(this)">
+                    <h2>Macro Ação</h2>
+                    <p>{{ macro_acao.texto }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    <button onclick="addPostit()">Adicionar Post-it</button>
+
+    <script>
+        const position = { x: 0, y: 0 }
+
+        interact('.postit').draggable({
+            listeners: {
+                start (event) {
+                    console.log(event.type, event.target)
+                },
+                move (event) {
+                    position.x += event.dx
+                    position.y += event.dy
+                    event.target.style.transform =
+                    `translate(${position.x}px, ${position.y}px)`
+                },
+            }
+        });
+
+        function editPostit(postit) {
+            var text = prompt("Digite o novo texto para o post-it:");
+            if (text) {
+                postit.querySelector("p").innerText = text;
+            }
+        }
+
+
+        function addPostit() {
+            var color = prompt("Digite a cor do post-it (green, blue, orange, yellow):");
+            var title = prompt("Digite o título do post-it:");
+            var text = prompt("Digite o texto do post-it:");
+
+            if (color && title && text) {
+                var container = document.getElementById("postitContainer");
+                var postit = document.createElement("div");
+                postit.className = "postit " + color;
+                postit.ondblclick = function() { editPostit(this); };
+
+                var h2 = document.createElement("h2");
+                h2.innerText = title;
+                postit.appendChild(h2);
+
+                var p = document.createElement("p");
+                p.innerText = text;
+                postit.appendChild(p);
+
+                container.appendChild(postit);
+
+                interact(postit).draggable({
+                    listeners: {
+                        start (event) {
+                            console.log(event.type, event.target)
+                        },
+                        move (event) {
+                            position.x += event.dx
+                            position.y += event.dy
+                            event.target.style.transform =
+                            `translate(${position.x}px, ${position.y}px)`
+                        },
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

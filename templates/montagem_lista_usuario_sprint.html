@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Montagem de Lista de Tarefas por Usuário</h1>
+    <form method="POST" action="{{ url_for('montagem_lista_usuario_sprint') }}">
+        <div class="form-group">
+            <label for="empresa">Selecione a Empresa:</label>
+            <select id="empresa" name="empresa" class="form-control">
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Selecionar</button>
+        </div>
+    </form>
+{% endblock %}

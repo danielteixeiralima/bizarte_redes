@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Revisar Tarefas da Semana</h1>
+    <h2>Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</h2>
+    <h3>Cargo: {{ usuario.cargo }}</h3>
+
+    <h4>Tarefas da Semana:</h4>
+    {% for tarefa in session['tarefas_semana'] %}
+        <p>Tarefa: {{ tarefa['tarefa'] }}</p>
+        <p>Data para conclusão: {{ tarefa['data_para_conclusão'] }}</p>
+        <p>Passo 1: {{ tarefa['passo1'] }} - Data: {{ tarefa['data1'] }}</p>
+        <p>Passo 2: {{ tarefa['passo2'] }} - Data: {{ tarefa['data2'] }}</p>
+        <p>Passo 3: {{ tarefa['passo3'] }} - Data: {{ tarefa['data3'] }}</p>
+        <p>Passo 4: {{ tarefa['passo4'] }} - Data: {{ tarefa['data4'] }}</p>
+        <p>Passo 5: {{ tarefa['passo5'] }} - Data: {{ tarefa['data5'] }}</p>
+        <p>Passo 6: {{ tarefa['passo6'] }} - Data: {{ tarefa['data6'] }}</p>
+    {% endfor %}
+
+    <form method="POST" action="{{ url_for('aprovar_tarefas') }}">
+        <button type="submit" class="btn btn-primary">Aprovar Tarefas</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('refazer_tarefa', usuario_id=session['usuario_id']) }}">
+        <div class="form-group">
+            <label for="feedback">Feedback:</label>
+            <textarea class="form-control" id="feedback" name="feedback"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Refazer Tarefa</button>
+    </form>
+{% endblock %}

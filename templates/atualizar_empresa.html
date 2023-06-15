@@ -9,29 +9,76 @@
             empresas.push(empresa[i].name); // Adiciona o nome da empresa ao array 'lista'
         }
     </script>
-    <form class="form-style" action="{{ url_for('atualizar_empresa', id=empresa.id) }}" method="post">
-        <label for="nome_contato">Nome do Contato:</label><br>
-        <input type="text" id="nome_contato" name="nome_contato" value="{{ empresa.nome_contato }}"><br>
-        <label for="email_contato">Email do Contato:</label><br>
-        <input type="email" id="email_contato" name="email_contato" value="{{ empresa.email_contato }}"><br>
-        <label for="telefone_contato">Telefone do Contato:</label><br>
-        <input type="tel" id="telefone_contato" name="telefone_contato" value="{{ empresa.telefone_contato }}"><br>
-        <label for="endereco_empresa">Endereço da Empresa:</label><br>
-        <input type="text" id="endereco_empresa" name="endereco_empresa" value="{{ empresa.endereco_empresa }}"><br>
-        <label for="setor_atuacao">Setor de Atuação:</label><br>
-        <input type="text" id="setor_atuacao" name="setor_atuacao" value="{{ empresa.setor_atuacao }}"><br>
-        <label for="tamanho_empresa">Tamanho da Empresa:</label><br>
-        <input type="text" id="tamanho_empresa" name="tamanho_empresa" value="{{ empresa.tamanho_empresa }}"><br>
-        <label for="descricao_empresa">Descrição da Empresa:</label><br>
-        <textarea id="descricao_empresa" name="descricao_empresa">{{ empresa.descricao_empresa }}</textarea><br>
-        <label for="objetivos_principais">Objetivos Principais:</label><br>
-        <textarea id="objetivos_principais" name="objetivos_principais">{{ empresa.objetivos_principais }}</textarea><br>
-        <label for="historico_interacoes">Histórico de Interações:</label><br>
-        <textarea id="historico_interacoes" name="historico_interacoes">{{ empresa.historico_interacoes }}</textarea><br>
-        <label for="vincular_instagram">Vincular conta do Instagram:</label><br>
-        <select id="vincular_instagram" name="vincular_instagram"></select><br>
-        <input type="submit" value="Atualizar">
-    </form>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height:100vh">
+            <div class="col-4">
+                <h2 class="text-center mb-4 text-white">Atualizar Empresa</h2>
+                <div class="card" style="background-color: #333;">
+                    <div class="card-body">
+                        <form action="{{ url_for('atualizar_empresa', id=empresa.id) }}" method="post">
+                            <div class="form-group">
+                                <label for="nome_contato" style="color: white;">Nome do Contato:</label>
+                                <input type="text" class="form-control" id="nome_contato" name="nome_contato" value="{{ empresa.nome_contato }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email_contato" style="color: white;">Email do Contato:</label>
+                                <input type="email" class="form-control" id="email_contato" name="email_contato" value="{{ empresa.email_contato }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefone_contato" style="color: white;">Telefone do Contato:</label>
+                                <input type="tel" class="form-control" id="telefone_contato" name="telefone_contato" value="{{ empresa.telefone_contato }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endereco_empresa" style="color: white;">Endereço da Empresa:</label>
+                                <input type="text" class="form-control" id="endereco_empresa" name="endereco_empresa" value="{{ empresa.endereco_empresa }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="setor_atuacao" style="color: white;">Setor de Atuação:</label>
+                                <input type="text" class="form-control" id="setor_atuacao" name="setor_atuacao" value="{{ empresa.setor_atuacao }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tamanho_empresa" style="color: white;">Tamanho da Empresa:</label>
+                                <input type="text" class="form-control" id="tamanho_empresa" name="tamanho_empresa" value="{{ empresa.tamanho_empresa }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="descricao_empresa" style="color: white;">Descrição da Empresa:</label>
+                                <textarea class="form-control" id="descricao_empresa" name="descricao_empresa" required>{{ empresa.descricao_empresa }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="objetivos_principais" style="color: white;">Objetivos Principais:</label>
+                                <textarea class="form-control" id="objetivos_principais" name="objetivos_principais" required>{{ empresa.objetivos_principais }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="historico_interacoes" style="color: white;">Histórico de Interações:</label>
+                                <textarea class="form-control" id="historico_interacoes" name="historico_interacoes" required>{{ empresa.historico_interacoes }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="vincular_instagram" style="color: white;">Vincular conta do :</label>
+                                <textarea class="form-control" id="vincular_instagram" name="vincular_instagram" required>{{ empresa.vincular_instagram }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Atualizar</button>
+                        </form>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', (event) => {
+                                var select = document.getElementById('vincular_instagram');
+                                empresas.unshift("");
+                                for(var i = 0; i < empresas.length + 1; i++) {
+                                    var opt = document.createElement('option');
+                                    
+                                    opt.value = empresas[i];
+                                    opt.innerHTML = empresas[i];
+                                    if (empresas[i] == "{{ empresa.vincular_instagram }}") {
+                                        opt.selected = true;
+                                    }
+                                    select.appendChild(opt);
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             var select = document.getElementById('vincular_instagram');

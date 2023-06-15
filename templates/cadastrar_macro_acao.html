@@ -4,10 +4,10 @@
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height:100vh">
             <div class="col-4">
-                <h1 class="text-center mb-4 text-white">Cadastrar Novo OKR</h1>
+                <h1 class="text-center mb-4 text-white">Cadastrar Macro Ação</h1>
                 <div class="card" style="background-color: #333;">
                     <div class="card-body">
-                        <form action="{{ url_for('cadastrar_okr') }}" method="POST">
+                        <form action="{{ url_for('cadastrar_macro_acao') }}" method="POST">
                             <div class="form-group">
                                 <label for="empresa" style="color: black;">Empresa:</label>
                                 <select class="form-control" id="empresa" name="empresa" required>
@@ -18,15 +18,21 @@
                             </div>
                             <div class="form-group">
                                 <label for="objetivo" style="color: black;">Objetivo:</label>
-                                <input type="text" class="form-control" id="objetivo" name="objetivo" required>
+                                <select class="form-control" id="objetivo" name="objetivo" required>
+                                    {% for objetivo in objetivos %}
+                                        <option value="{{ objetivo.id }}">{{ objetivo.objetivo }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="data_inicio" style="color: black;">Data Início:</label>
-                                <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                                <label for="kr" style="color: black;">KR:</label>
+                                <select class="form-control" id="kr" name="kr" required>
+                                    <!-- Os KRs serão preenchidos dinamicamente pelo JavaScript -->
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="data_fim" style="color: black;">Data Fim:</label>
-                                <input type="date" class="form-control" id="data_fim" name="data_fim" required>
+                                <label for="texto" style="color: black;">Texto:</label>
+                                <input type="text" class="form-control" id="texto" name="texto" required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
                         </form>
@@ -35,4 +41,5 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 {% endblock %}

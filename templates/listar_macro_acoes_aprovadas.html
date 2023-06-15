@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Macro Ações Aprovadas</h1>
+    <a href="{{ url_for('cadastrar_macro_acao') }}" class="btn btn-primary">Cadastrar Nova Macro Ação</a>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Empresa</th>
+                <th>Objetivo</th>
+                <th>KR</th>
+                <th>Texto</th>
+                <th>Aprovada</th>
+                <th>Data de Inclusão</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for acao in macro_acoes %}
+            <tr>
+                <td>{{ acao.id }}</td>
+                <td>{{ acao.empresa }}</td>
+                <td>{{ acao.objetivo }}</td>
+                <td>{{ acao.kr.texto }}</td>
+                <td>{{ acao.texto }}</td>
+                <td>{{ acao.aprovada }}</td>
+                <td>{{ acao.data_inclusao }}</td>
+                <td>
+                    <a href="{{ url_for('atualizar_macro_acao', id=acao.id) }}" class="btn btn-primary">Atualizar</a>
+                    <a href="{{ url_for('deletar_macro_acao', id=acao.id) }}" class="btn btn-danger">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

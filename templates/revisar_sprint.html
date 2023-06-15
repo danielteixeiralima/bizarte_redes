@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="my-4" style="color: white;">Revisar Sprints</h1>
+        <form method="POST" action="{{ url_for('aprovar_sprints') }}">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" style="color: white;">Prioridade</th>
+                        <th scope="col" style="color: white;">Tarefa</th>
+                        <th scope="col" style="color: white;">Responsável</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sprint in session['sprints'] %}
+                    <tr>
+                        <td style="color: white;">{{ sprint['prioridade'] }}</td>
+                        <td style="color: white;">{{ sprint['tarefa'] }}</td>
+                        <td style="color: white;">{{ sprint['responsável'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Aprovar Sprints</button>
+        </form>
+        <form method="POST" action="{{ url_for('refazer_sprint') }}">
+            <div class="mb-3">
+                <label for="feedback" class="form-label" style="color: white;">Feedback</label>
+                <textarea name="feedback" id="feedback" rows="4" class="form-control" placeholder="Digite seu feedback aqui..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Refazer Sprints</button>
+        </form>
+    </div>
+{% endblock %}

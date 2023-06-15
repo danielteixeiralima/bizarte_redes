@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Montagem Sprint da Semana</h1>
+    <form method="POST" action="{{ url_for('criar_sprint_semana') }}">
+        <div class="form-group">
+            <label for="empresa">Selecione a Empresa:</label>
+            <select id="empresa" name="empresa" class="form-control">
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="descricao_div" class="form-group">
+            <!-- A descrição da empresa será colocada aqui -->
+        </div>
+
+        <div id="cargos_div" class="form-group">
+            <!-- Os cargos dos usuários serão colocados aqui -->
+        </div>
+
+        <div id="okrs_div" class="form-group">
+            <!-- OKRs associados serão colocados aqui -->
+        </div>
+
+        <div id="krs_div" class="form-group">
+            <!-- KRs associados serão colocados aqui -->
+        </div>
+
+        <div id="macroacoes_div" class="form-group">
+            <!-- Macroações associadas serão colocadas aqui -->
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Criar Sprint da Semana</button>
+        </div>
+    </form>
+{% endblock %}

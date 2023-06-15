@@ -7,11 +7,9 @@
         <thead>
             <tr>
                 <th>Empresa</th>
-                <th>Objetivo 1</th>
-                <th>Objetivo 2</th>
-                <th>Objetivo 3</th>
-                <th>Objetivo 4</th>
-                <th>Objetivo 5</th>
+                <th>Objetivo</th>
+                <th>Data Início</th>
+                <th>Data Fim</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -19,11 +17,9 @@
             {% for okr in okrs %}
             <tr>
                 <td>{{ okr.empresa.nome_contato }}</td>
-                <td>{{ okr.objetivo_1 }}</td>
-                <td>{{ okr.objetivo_2 }}</td>
-                <td>{{ okr.objetivo_3 }}</td>
-                <td>{{ okr.objetivo_4 }}</td>
-                <td>{{ okr.objetivo_5 }}</td>
+                <td>{{ okr.objetivo }}</td>
+                <td>{{ okr.data_inicio }}</td>
+                <td>{{ okr.data_fim }}</td>
                 <td>
                     <a href="{{ url_for('atualizar_okr', id=okr.id) }}" class="btn btn-primary">Atualizar</a>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{okr.id}}">Deletar</button>

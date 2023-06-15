@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>KR: {{ kr.texto }}</h1>
+    <p>Empresa: {{ kr.okr.empresa.nome_contato }}</p>
+    <p>Objetivo: {{ kr.okr.objetivo }}</p>
+    <p>Usuários:</p>
+    {% for usuario in kr.okr.empresa.usuarios %}
+        <p>{{ usuario.nome }} {{ usuario.sobrenome }}, {{ usuario.cargo }}</p>
+    {% endfor %}
+    <p>Descrição da Empresa: {{ kr.okr.empresa.descricao_empresa }}</p>
+    <form method="post">
+        <input type="submit" value="Gerar Macro Ação" class="btn btn-primary">
+    </form>
+{% endblock %}

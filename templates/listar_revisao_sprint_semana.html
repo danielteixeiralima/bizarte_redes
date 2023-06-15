@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Sprints da Empresa</h1>
+    <a href="{{ url_for('cadastrar_sprint') }}" class="btn btn-primary">Incluir Sprint da Semana</a>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome da Empresa</th>
+                <th>Prioridade</th>
+                <th>Tarefa</th>
+                <th>Usuário</th>
+                <th>Grupo de Usuários</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sprint in sprints %}
+            <tr>
+                <td>{{ sprint.id }}</td>
+                <td>{{ sprint.nome_empresa }}</td>
+                <td>{{ sprint.prioridade }}</td>
+                <td>{{ sprint.tarefa }}</td>
+                <td>{{ sprint.usuario.nome if sprint.usuario else 'N/A' }}</td>
+                <td>{{ sprint.usuario_grupo }}</td>
+                <td>{{ sprint.data_criacao }}</td>
+                <td>
+                    <a href="{{ url_for('atualizar_sprint', id=sprint.id) }}" class="btn btn-primary">Atualizar</a>
+                    <a href="{{ url_for('deletar_sprint', id=sprint.id) }}" class="btn btn-danger">Deletar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,5 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask import json
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 
 db = SQLAlchemy()
@@ -18,17 +21,20 @@ class Empresa(db.Model):
     vincular_instagram = db.Column(db.String(200))
 
 
+
+
+
 class Resposta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     pergunta = db.Column(db.Text, nullable=False)
     resposta = db.Column(db.Text)
-    classificacao = db.Column(db.String(200))  # Nova coluna
+    classificacao = db.Column(db.String(200))
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
 
-class Usuario(db.Model):
+class Usuario(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(80), nullable=False)
     sobrenome = db.Column(db.String(80), nullable=False)
@@ -39,6 +45,7 @@ class Usuario(db.Model):
     data_entrada = db.Column(db.DateTime, default=datetime.utcnow)
     cargo = db.Column(db.String(80), nullable=False)
     status = db.Column(db.String(20), nullable=False)
+<<<<<<< HEAD
     sprint = db.Column(db.String(200))  # Novo campo
     dayling_1 = db.Column(db.String(200))  # Novo campo
     dayling_2 = db.Column(db.String(200))  # Novo campo
@@ -52,25 +59,48 @@ class Usuario(db.Model):
             'sobrenome': self.sobrenome,
             'email': self.email,
         }
+=======
+    sprint = db.Column(db.String(200))
+    dayling_1 = db.Column(db.String(200))
+    dayling_2 = db.Column(db.String(200))
+    dayling_3 = db.Column(db.String(200))
+    dayling_4 = db.Column(db.String(200))
+    dayling_5 = db.Column(db.String(200))
+    password_hash = db.Column(db.String(128))
+    is_admin = db.Column(db.Boolean, default=False)
+
+    @property
+    def password(self):
+        raise AttributeError('password: campo de leitura apenas')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+>>>>>>> 94e508a0bac959678b7f81a58db7835536d810a3
 
 class OKR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     empresa = db.relationship('Empresa', backref='okrs')
-    objetivo_1 = db.Column(db.String(200))
-    objetivo_2 = db.Column(db.String(200))
-    objetivo_3 = db.Column(db.String(200))
-    objetivo_4 = db.Column(db.String(200))
-    objetivo_5 = db.Column(db.String(200))
+    objetivo = db.Column(db.String(200))
+    data_inicio = db.Column(db.DateTime, nullable=False)
+    data_fim = db.Column(db.DateTime, nullable=False)
+
 
 
 
 class KR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     id_okr = db.Column(db.Integer, db.ForeignKey('okr.id'), nullable=False)
     texto = db.Column(db.String(200))
+    data_inclusao = db.Column(db.DateTime, default=datetime.utcnow)
     okr = db.relationship('OKR', backref='krs')
 
+<<<<<<< HEAD
 class PostInstagram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_empresa = db.Column(db.String(64), index=True)
@@ -144,3 +174,56 @@ class AnaliseInstagram(db.Model):
             'analise': self.analise,
             'nome_empresa': self.nome_empresa,
         }
+=======
+
+
+
+class MacroAcao(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    texto = db.Column(db.String(500), nullable=False)
+    aprovada = db.Column(db.Boolean, default=False)
+    data_inclusao = db.Column(db.DateTime, default=datetime.utcnow)
+    kr_id = db.Column(db.Integer, db.ForeignKey('kr.id'), nullable=False)
+    objetivo = db.Column(db.String(500), nullable=False)
+    objetivo_id = db.Column(db.Integer, nullable=False)
+    empresa = db.Column(db.String(500), nullable=False)
+    empresa_id = db.Column(db.Integer, nullable=False)
+    kr = db.relationship('KR', backref='macro_acoes')
+
+
+
+class Sprint(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    nome_empresa = db.Column(db.String(120), nullable=False)
+    prioridade = db.Column(db.Integer, nullable=False)
+    tarefa = db.Column(db.Text, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=True)
+    usuario = db.relationship('Usuario', backref='sprints')
+    usuario_grupo = db.Column(db.String(120), nullable=True)
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class TarefaSemanal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref='tarefas_semanais')
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario = db.relationship('Usuario', backref='tarefas_semanais')
+    tarefa_semana = db.Column(db.String(500), nullable=False)
+    to_do = db.Column(db.String(10000), nullable=True)
+    observacoes = db.Column(db.String(10000), nullable=True)
+    data_para_conclusao = db.Column(db.DateTime, nullable=False)
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    @property
+    def to_do_decoded(self):
+        return json.loads(self.to_do)
+
+    def observacoes_decoded(self):
+        return json.loads(self.observacoes)
+
+
+
+>>>>>>> 94e508a0bac959678b7f81a58db7835536d810a3

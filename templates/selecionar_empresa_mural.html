@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Selecione a Empresa para o Mural</h1>
+    <form method="POST" action="{{ url_for('selecionar_empresa_mural') }}">
+
+        <div class="form-group">
+            <label for="empresa">Selecione a Empresa:</label>
+            <select id="empresa" name="empresa" class="form-control">
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Selecionar</button>
+        </div>
+    </form>
+{% endblock %}

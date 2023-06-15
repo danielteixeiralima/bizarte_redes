@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4 text-dark">Atualizar Tarefa Semanal</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="tarefa_semana" class="text-dark">Tarefa da Semana:</label>
+                    <input type="text" id="tarefa_semana" name="tarefa_semana" class="form-control text-dark" value="{{ tarefa.tarefa_semana }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="data_para_conclusao" class="text-dark">Data para Conclusão:</label>
+                    <input type="date" id="data_para_conclusao" name="data_para_conclusao" class="form-control text-dark" value="{{ tarefa.data_para_conclusao.strftime('%Y-%m-%d') }}" required>
+                </div>
+
+                <h3 class="text-dark">Status da Tarefa:</h3>
+                <div class="form-group">
+                    <label for="status_tarefa" class="text-dark">Status da Tarefa:</label>
+                    <select id="status_tarefa" name="status_tarefa" class="form-control text-dark" required>
+                        <option value="pendente" {% if tarefa.observacoes_decoded().get('status_tarefa') == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="em progresso" {% if tarefa.observacoes_decoded().get('status_tarefa') == 'em progresso' %}selected{% endif %}>Em progresso</option>
+                        <option value="concluído" {% if tarefa.observacoes_decoded().get('status_tarefa') == 'concluído' %}selected{% endif %}>Concluído</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_tarefa" class="text-dark">Observações da Tarefa:</label>
+                    <textarea id="observacao_tarefa" name="observacao_tarefa" class="form-control text-dark" rows="3" required>{{ tarefa.observacoes_decoded().get('observacao_tarefa') }}</textarea>
+                </div>
+
+                <h3 class="text-dark">Passos:</h3>
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Passo</th>
+                            <th scope="col">Data</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if 'passos' in tarefa.to_do_decoded and 'datas' in tarefa.to_do_decoded %}
+                            {% for i in range(len(tarefa.to_do_decoded['passos'])) %}
+                                <tr>
+                                    <td>
+                                        <input type="text" id="passo{{i+1}}" name="passo{{i+1}}" class="form-control text-dark" value="{{ tarefa.to_do_decoded['passos'][i] }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="date" id="data{{i+1}}" name="data{{i+1}}" class="form-control text-dark" value="{{ tarefa.to_do_decoded['datas'][i] }}" required>
+                                    </td>
+                                    <td>
+                                        <select id="status{{i+1}}" name="status{{i+1}}" class="form-control text-dark">
+                                            <option value="pendente" {% if tarefa.to_do_decoded['status'][i] == 'pendente' %}selected{% endif %}>Pendente</option>
+                                            <option value="em progresso" {% if tarefa.to_do_decoded['status'][i] == 'em progresso' %}selected{% endif %}>Em progresso</option>
+                                            <option value="concluído" {% if tarefa.to_do_decoded['status'][i] == 'concluído' %}selected{% endif %}>Concluído</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('deletar_todo', id=tarefa.id, todo_index=i) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary btn-block">Atualizar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

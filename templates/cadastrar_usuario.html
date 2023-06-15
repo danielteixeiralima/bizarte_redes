@@ -1,29 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Cadastrar Novo Usuário</h1>
-    <form action="{{ url_for('cadastrar_usuario') }}" method="POST">
-        <label for="nome">Nome:</label><br>
-        <input type="text" id="nome" name="nome"><br>
-        <label for="sobrenome">Sobrenome:</label><br>
-        <input type="text" id="sobrenome" name="sobrenome"><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email"><br>
-        <label for="celular">Celular:</label><br>
-        <input type="text" id="celular" name="celular"><br>
-        <label for="id_empresa">Empresa:</label><br>
-        <select id="id_empresa" name="id_empresa">
-            {% for empresa in empresas %}
-                <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="cargo">Cargo:</label><br>
-        <input type="text" id="cargo" name="cargo"><br>
-        <label for="status">Status:</label><br>
-        <select id="status" name="status">
-            <option value="ativo">Ativo</option>
-            <option value="inativo">Inativo</option>
-        </select><br>
-        <input type="submit" value="Cadastrar">
-    </form>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height:100vh">
+            <div class="col-4">
+                <h1 class="text-center mb-4 text-white">Cadastrar Novo Usuário</h1>
+                <div class="card" style="background-color: #333;">
+                    <div class="card-body">
+                        <form action="{{ url_for('cadastrar_usuario') }}" method="POST">
+                            <div class="form-group">
+                                <label for="nome" style="color: black;">Nome:</label>
+                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="sobrenome" style="color: black;">Sobrenome:</label>
+                                <input type="text" class="form-control" id="sobrenome" name="sobrenome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" style="color: black;">Email:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password" style="color: black;">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="celular" style="color: black;">Celular:</label>
+                                <input type="text" class="form-control" id="celular" name="celular" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_empresa" style="color: black;">Empresa:</label>
+                                <select class="form-control" id="id_empresa" name="id_empresa">
+                                    {% for empresa in empresas %}
+                                        <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="cargo" style="color: black;">Cargo:</label>
+                                <input type="text" class="form-control" id="cargo" name="cargo" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="status" style="color: black;">Status:</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="ativo">Ativo</option>
+                                    <option value="inativo">Inativo</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

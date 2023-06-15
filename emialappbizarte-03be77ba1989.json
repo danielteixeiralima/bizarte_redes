@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "emialappbizarte",
+  "private_key_id": "03be77ba1989e54d40e73f4446d0a32c595d0cb0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC8TSJtZk5M6lDW\n56cnGH8JesMzQQkS76OEGo5n2FKKTc0K5elMBK1nzuBK7HByvalevA9Xh5kZZVgB\nefmt4pFLsvp4PlkyRNmRDmwXK51tXKdfcoMqJ4aBnbzU/jGJ5WMDAKmJIIs2e93f\nYEbz/Zoz9K1NFVupAZPUsw8USuj1LPYsUeWb3mJin12iY5n0iKDm75EA9kkpdmHr\nIzM3185qSKPRpoME15llJgX6PWDZADGrVtRk7ABhpejs9IfXgjvur7oGy9qnB/X8\nnwRqOEC7uw7j/SK/egxDlZnzKfUZTN+IJOov3BzMrOu7iNIjcbqGVVAKjCu6XC8Q\n4Zi1lC9tAgMBAAECggEACy6mrD0Zyke7j3LIHBjAacIzqsZvPdCJ8w1J4ERAhpXf\nM6LHcd9XPH87Fgf1F5AVNk4c64aroo5aC+BmYbUL1th+nYediWnJ5J51vQLqJ7WL\nlPrHOK7wz5+CUfQnrsSdPO9PO7IsjwqlEh/02eysbLulIDSnMe6pJkXDgy6w2rP7\nnB+4p67xTNCyj1s4JEpc/nzEagJmViQjSLIiRP3g2QBgZLV3oGdq383mrMZasXte\nDdM5+gel/0Gb6vgr+y2rJT4Yt5dNGZvSWCgaKCDnoS+hUOd8q9hwHWJ691lSGca6\ntWQ4VcAd19GM74zwGKUyIKtNYFOjTMa6nV4uuONvWwKBgQD8GiPTmasbkQtr2kQt\n5T1OrJeVaKMtNswyaIMSZphAjS43q1riXj0c1hG9iWzwS9TVV/ywu7FKrynZeBId\ne5gv849qqPBQydDCwGAdEF0z/NCNl/FNO25a487N44HoPSp/Nu19YiK4sU7zEwTS\ngGFJbfQMfKbpS8y4O1qMhFqA3wKBgQC/NnX612YhYyuYsF8uNVikZox+NGNEiV6g\nClmTzuPo//vG6Rk2lhPE0HABMtEeh+qUmU7TT1lfnspWZIGo6QfDeTnLgMVpWX6V\nypk/mKSYYQ+BPf701kRh9ZQw5ybEgTOINBTqlDfNjX+PdcNpZuXfTShvgvZd08v/\n/LzeFzTdMwKBgCEIH8ea6+OJxrBUAfjtf3HuhVILSs4izvCP5xSjIrHajcK3jgn5\nBRLhLaPi/MYjeXiWtcJGZX1+pAIdjGoWhqNJy3HTPuGm/9Z0tGM6gKvOJVlYHkLb\nVaNNFAzAEYZndUkD3mw+ToRanxiUVl5qedTQNljogEozJ1jAViXxNZaLAoGBAJHS\nus7+DklQFCNx/mSDEoLuIh7tXPcbvCpZOk9a7Lz4286qXiwe8BycyY5gbtLV3LRO\n5qqITSR7ONwB8lAax2zvun/USLk7IyqhQ5YYlw4Ol4B9Az89WRFL9CQHZK1fyykI\nbxsmxhfg3XNO4CQ18QEHGttQCQstRtqGqJLHJ+25AoGBAO7Vau4AnMwWiD0WiMUY\nPCWefnnO/ikM87YJwblfgDyjL21ufSIo+OMZ74DkhD/7+8NLAA74krr0AVCewfLZ\nvldkg4F1mf9xefktpkSFerfCdrbaTJGNSOD4jPVHtc+27mnpvSnreu1akZnJpCYj\nmKDgqnH/CLtZ7Z4D/YV9z2L8\n-----END PRIVATE KEY-----\n",
+  "client_email": "bizarte-app-email@emialappbizarte.iam.gserviceaccount.com",
+  "client_id": "114047558140513562336",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bizarte-app-email%40emialappbizarte.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

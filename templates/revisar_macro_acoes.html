@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="my-4">Revisar Macro Ações</h1>
+        <form method="POST">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Ação</th>
+                        <th scope="col">Prioridade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for acao in macro_acoes %}
+                    <tr>
+                        <th scope="row">{{ acao.id }}</th>
+                        <td>{{ acao.acao }}</td>
+                        <td>{{ acao.prioridade }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Aprovar Macro Ações</button>
+        </form>
+        <form method="POST" action="{{ url_for('refazer_macro_acao', id=session['kr_id']) }}" class="mt-4">
+            <div class="mb-3">
+                <label for="feedback" class="form-label">Feedback</label>
+                <textarea name="feedback" id="feedback" rows="4" class="form-control" placeholder="Digite seu feedback aqui..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Refazer Macro Ações</button>
+        </form>
+    </div>
+{% endblock %}

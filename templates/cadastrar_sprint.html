@@ -4,10 +4,10 @@
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height:100vh">
             <div class="col-4">
-                <h1 class="text-center mb-4 text-white">Cadastrar Novo OKR</h1>
+                <h1 class="text-center mb-4 text-white">Cadastrar Sprint da Semana</h1>
                 <div class="card" style="background-color: #333;">
                     <div class="card-body">
-                        <form action="{{ url_for('cadastrar_okr') }}" method="POST">
+                        <form action="{{ url_for('cadastrar_sprint') }}" method="POST">
                             <div class="form-group">
                                 <label for="empresa" style="color: black;">Empresa:</label>
                                 <select class="form-control" id="empresa" name="empresa" required>
@@ -17,16 +17,20 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="objetivo" style="color: black;">Objetivo:</label>
-                                <input type="text" class="form-control" id="objetivo" name="objetivo" required>
+                                <label for="usuario" style="color: black;">Usuário:</label>
+                                <select class="form-control" id="usuario" name="usuario" required>
+                                    {% for usuario in usuarios %}
+                                        <option value="{{ usuario.id }}">{{ usuario.nome }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="data_inicio" style="color: black;">Data Início:</label>
-                                <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                                <label for="tarefa" style="color: black;">Tarefa:</label>
+                                <input type="text" class="form-control" id="tarefa" name="tarefa" required>
                             </div>
                             <div class="form-group">
-                                <label for="data_fim" style="color: black;">Data Fim:</label>
-                                <input type="date" class="form-control" id="data_fim" name="data_fim" required>
+                                <label for="prioridade" style="color: black;">Prioridade:</label>
+                                <input type="number" class="form-control" id="prioridade" name="prioridade" min="1" max="5" required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
                         </form>

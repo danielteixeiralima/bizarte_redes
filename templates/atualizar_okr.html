@@ -1,24 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Atualizar OKR</h1>
-    <form action="{{ url_for('atualizar_okr', id=okr.id) }}" method="POST">
-        <label for="empresa">Empresa:</label><br>
-        <select id="empresa" name="empresa">
-            {% for empresa in empresas %}
-                <option value="{{ empresa.id }}" {% if empresa.id == okr.id_empresa %} selected {% endif %}>{{ empresa.nome_contato }}</option>
-            {% endfor %}
-        </select><br>
-        <label for="objetivo_1">Objetivo 1:</label><br>
-        <input type="text" id="objetivo_1" name="objetivo_1" value="{{ okr.objetivo_1 }}"><br>
-        <label for="objetivo_2">Objetivo 2:</label><br>
-        <input type="text" id="objetivo_2" name="objetivo_2" value="{{ okr.objetivo_2 }}"><br>
-        <label for="objetivo_3">Objetivo 3:</label><br>
-        <input type="text" id="objetivo_3" name="objetivo_3" value="{{ okr.objetivo_3 }}"><br>
-        <label for="objetivo_4">Objetivo 4:</label><br>
-        <input type="text" id="objetivo_4" name="objetivo_4" value="{{ okr.objetivo_4 }}"><br>
-        <label for="objetivo_5">Objetivo 5:</label><br>
-        <input type="text" id="objetivo_5" name="objetivo_5" value="{{ okr.objetivo_5 }}"><br>
-        <input type="submit" value="Atualizar">
-    </form>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height:100vh">
+            <div class="col-4">
+                <h2 class="text-center mb-4 text-white">Atualizar OKR</h2>
+                <div class="card" style="background-color: #333;">
+                    <div class="card-body">
+                        <form action="{{ url_for('atualizar_okr', id=okr.id) }}" method="POST">
+                            <div class="form-group">
+                                <label for="empresa" style="color: white;">Empresa:</label>
+                                <select class="form-control" id="empresa" name="empresa">
+                                    {% for empresa in empresas %}
+                                        <option value="{{ empresa.id }}" {% if empresa.id == okr.id_empresa %} selected {% endif %}>{{ empresa.nome_contato }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="objetivo" style="color: white;">Objetivo:</label>
+                                <input type="text" class="form-control" id="objetivo" name="objetivo" value="{{ okr.objetivo }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="data_inicio" style="color: white;">Data de início do ciclo:</label>
+                                <input type="date" class="form-control" id="data_inicio" name="data_inicio" value="{{ okr.data_inicio.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="data_fim" style="color: white;">Data de fim do ciclo:</label>
+                                <input type="date" class="form-control" id="data_fim" name="data_fim" value="{{ okr.data_fim.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Atualizar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

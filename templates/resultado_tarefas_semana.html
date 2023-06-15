@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Resultado das Tarefas da Semana</h1>
+    <h2>Empresa: {{ empresa.nome }}</h2>
+    <h3>Usuário: {{ usuario.nome }} {{ usuario.sobrenome }}</h3>
+    <h3>Cargo: {{ usuario.cargo }}</h3>
+
+    <h4>Tarefas da Semana:</h4>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Nome da Empresa</th>
+                <th>Usuário</th>
+                <th>Tarefa da Semana</th>
+                <th>Data para Conclusão</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tarefa in tarefas_semanais %}
+                <tr>
+                    <td>{{ usuarios[tarefa.usuario_id] }}</td>
+                    <td>{{ empresas[tarefa.empresa_id] }}</td>
+                    <td>{{ tarefa.tarefa_semana }}</td>
+                    <td>{{ tarefa.data_para_conclusao }}</td>
+                </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+{% endblock %}

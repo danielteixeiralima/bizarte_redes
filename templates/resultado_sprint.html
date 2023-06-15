@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Planos de Sprint Semanal Gerados</h1>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome da Empresa</th>
+                <th>Prioridade</th>
+                <th>Tarefa</th>
+                <th>Usuário Responsável</th>
+                <th>Data de Inclusão</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sprint in sprints %}
+            <tr>
+                <td>{{ sprint.id }}</td>
+                <td>{{ sprint.nome_empresa }}</td>
+                <td>{{ sprint.prioridade }}</td>
+                <td>{{ sprint.tarefa }}</td>
+                <td>{{ sprint.usuario.nome if sprint.usuario else 'N/A' }}</td>
+                <td>{{ sprint.data_inclusao }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

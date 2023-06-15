@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Tarefas Semanais por Usuário</h1>
+    <a href="{{ url_for('cadastrar_tarefa_semanal') }}" class="btn btn-primary">Cadastrar Tarefa Semanal por Usuário</a>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Empresa ID</th>
+                <th>Usuário</th>
+                <th>Tarefa Semana</th>
+                <th>Data para Conclusão</th>
+                <th>Passos e Datas</th>
+                <th>Data de Criação</th>
+                <th>Data de Atualização</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tarefa in tarefas_semanais %}
+            <tr>
+                <td>{{ tarefa['id'] }}</td>
+                <td>{{ tarefa['empresa_id'] }}</td>
+                <td>{{ tarefa['usuario'] }}</td>
+                <td>{{ tarefa['tarefa_semana'] }}</td>
+                <td>{{ tarefa['data_para_conclusao'] }}</td>
+                <td>
+                    {% if 'passos' in tarefa['to_do_decoded'] and 'datas' in tarefa['to_do_decoded'] %}
+                        {% for passo, data in zip(tarefa['to_do_decoded']['passos'], tarefa['to_do_decoded']['datas']) %}
+                            {{ passo }} - {{ data }}<br>
+                        {% endfor %}
+                    {% endif %}
+                </td>
+                <td>{{ tarefa['data_criacao'] }}</td>
+                <td>{{ tarefa['data_atualizacao'] }}</td>
+                <td>
+                    <form action="{{ url_for('atualizar_tarefa_semanal', id=tarefa['id']) }}" method="GET">
+                        <input type="submit" value="Atualizar" class="btn btn-primary">
+                    </form>
+                    <form action="{{ url_for('deletar_tarefa_semanal',id=tarefa['id']) }}" method="POST">
+                        <input type="submit" value="Deletar" class="btn btn-danger">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}

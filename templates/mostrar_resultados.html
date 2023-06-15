@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Macro Ações Geradas</h1>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Nome da Empresa</th>
+                <th>Objetivo</th>
+                <th>KR</th>
+                <th>Macro Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for acao in macro_acoes %}
+            <tr data-id="{{ acao.id }}">
+                <td>{{ acao.empresa.nome_contato }}</td>
+                <td>{{ acao.objetivo }}</td>
+                <td>{{ kr.texto }}</td>
+                <td>{{ acao.texto }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height:100vh">
+            <div class="col-4">
+                <h2 class="text-center mb-4 text-white">Cadastro de Empresa e Tarefas</h2>
+                <div class="card" style="background-color: #333;">
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="form-group">
+                                <label for="empresa" style="color: white;">Nome da Empresa:</label>
+                                <select class="form-control" id="empresa" name="empresa" required>
+                                    {% for empresa in empresas %}
+                                        <option value="{{ empresa.id }}">{{ empresa.nome_contato }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="usuario" style="color: white;">Nome do Usuário:</label>
+                                <select class="form-control" id="usuario" name="usuario" required>
+                                    <!-- Os usuários serão preenchidos dinamicamente pelo JavaScript -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tarefa_semana" style="color: white;">Tarefa:</label>
+                                <input type="text" class="form-control" id="tarefa_semana" name="tarefa_semana" required>
+                            </div>
+                            <h2 class="text-center mt-4 mb-4 text-white">Adicionar Passos à Tarefa</h2>
+                            <div id="passos_container">
+                                <div class="form-group passo">
+                                    <label for="passo_0" style="color: white;">Nome do Passo:</label>
+                                    <input type="text" class="form-control" id="passo_0" name="passo_0" required>
+                                    <label for="data_0" style="color: white;">Data:</label>
+                                    <input type="date" class="form-control" id="data_0" name="data_0" required>
+                                </div>
+                            </div>
+                            <button type="button" id="add_passo" class="btn btn-primary btn-block mt-4 mb-4">Adicionar Passo</button>
+                            <div class="form-group">
+                                <label for="data_para_conclusao" style="color: white;">Data para Conclusão da Tarefa:</label>
+                                <input type="date" class="form-control" id="data_para_conclusao" name="data_para_conclusao" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Macro Ações</h1>
+    <a class="btn" href="#">Cadastrar nova Macro Ação</a>
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Empresa</th>
+                <th>Objetivo</th>
+                <th>KR</th>
+                <th>Usuários</th>
+                <th>Descrição da Empresa</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for kr in krs %}
+            <tr>
+                <td>{{ kr.okr.empresa.nome_contato }}</td>
+                <td>{{ kr.okr.objetivo }}</td>
+                <td>{{ kr.texto }}</td>
+                <td>
+                    {% for usuario in kr.okr.empresa.usuarios %}
+                        {{ usuario.nome }} {{ usuario.sobrenome }}, {{ usuario.cargo }}<br>
+                    {% endfor %}
+                </td>
+                <td>{{ kr.okr.empresa.descricao_empresa }}</td>
+                <td>
+                    <a href="{{ url_for('gerar_macro_acao', id=kr.id) }}" class="btn btn-primary">Gerar Macro Ação</a>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

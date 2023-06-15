@@ -9,15 +9,17 @@
                 <th>Empresa</th>
                 <th>Objetivo</th>
                 <th>KR</th>
+                <th>Data de inclusão</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             {% for kr in krs %}
             <tr>
-                <td>{{ kr.okr.empresa.nome_contato }}</td>
-                <td>{{ kr.okr.objetivo_1 }}</td>
+                <td>{{ kr.okr.empresa.nome_contato if kr.okr.empresa else '' }}</td>
+                <td>{{ kr.okr.objetivo if kr.okr else '' }}</td>
                 <td>{{ kr.texto }}</td>
+                <td>{{ kr.data_inclusao }}</td>
                 <td>
                     <a href="{{ url_for('atualizar_kr', id=kr.id) }}" class="btn btn-primary">Atualizar</a>
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{kr.id}}">Deletar</button>
