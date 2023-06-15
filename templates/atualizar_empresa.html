@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <h1>Atualizar Empresa</h1>
+    <script>
+        var empresa = JSON.parse(localStorage.getItem('listaEmpresa'));
+        var empresas = [];
+        for (var i = 0; i < empresa.length; i++) {
+            empresas.push(empresa[i].name); // Adiciona o nome da empresa ao array 'lista'
+        }
+    </script>
     <div class="container">
         <div class="row justify-content-center align-items-center" style="height:100vh">
             <div class="col-4">
@@ -44,11 +52,47 @@
                                 <label for="historico_interacoes" style="color: white;">Histórico de Interações:</label>
                                 <textarea class="form-control" id="historico_interacoes" name="historico_interacoes" required>{{ empresa.historico_interacoes }}</textarea>
                             </div>
+                            <div class="form-group">
+                                <label for="vincular_instagram" style="color: white;">Vincular conta do :</label>
+                                <textarea class="form-control" id="vincular_instagram" name="vincular_instagram" required>{{ empresa.vincular_instagram }}</textarea>
+                            </div>
                             <button type="submit" class="btn btn-primary btn-block">Atualizar</button>
                         </form>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', (event) => {
+                                var select = document.getElementById('vincular_instagram');
+                                empresas.unshift("");
+                                for(var i = 0; i < empresas.length + 1; i++) {
+                                    var opt = document.createElement('option');
+                                    
+                                    opt.value = empresas[i];
+                                    opt.innerHTML = empresas[i];
+                                    if (empresas[i] == "{{ empresa.vincular_instagram }}") {
+                                        opt.selected = true;
+                                    }
+                                    select.appendChild(opt);
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var select = document.getElementById('vincular_instagram');
+            empresas.unshift("");
+            for(var i = 0; i < empresas.length + 1; i++) {
+                var opt = document.createElement('option');
+                
+                opt.value = empresas[i];
+                opt.innerHTML = empresas[i];
+                if (empresas[i] == "{{ empresa.vincular_instagram }}") {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            }
+        });
+    </script>
 {% endblock %}
