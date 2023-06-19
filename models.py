@@ -19,91 +19,6 @@ class Empresa(db.Model):
     objetivos_principais = db.Column(db.Text)
     historico_interacoes = db.Column(db.Text)
     vincular_instagram = db.Column(db.String(200))
-<<<<<<< HEAD
-=======
-
-
-
-
-
-class PostInstagram(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    id_empresa = db.Column(db.String(64), index=True)
-    timestamp = db.Column(db.String(64))
-    caption = db.Column(db.String(64))
-    like_count = db.Column(db.Integer)
-    comments_count = db.Column(db.Integer)
-    reach = db.Column(db.Integer)
-    percentage = db.Column(db.Float)
-    media_product_type = db.Column(db.String(64))
-    plays = db.Column(db.Integer)
-    saved = db.Column(db.Integer)
-    nome_empresa = db.Column(db.String(64))
-
-    def to_dicts(self):
-        return {
-            'id': self.id,  # incluir o id no dicionário
-            'id_empresa': self.id_empresa,
-            'timestamp': self.timestamp,
-            'caption': self.caption,
-            'like_count': self.like_count,
-            'comments_count': self.comments_count,
-            'reach': self.reach,
-            'percentage': self.percentage,
-            'media_product_type': self.media_product_type,
-            'plays': self.plays,
-            'saved': self.saved,
-            'nome_empresa': self.nome_empresa,
-        }
-    
-class PostsInstagram(db.Model):
-    id = db.Column(db.String, primary_key=True)
-    id_empresa = db.Column(db.String(64), index=True)
-    timestamp = db.Column(db.String(64))
-    caption = db.Column(db.String(64))
-    like_count = db.Column(db.Integer)
-    comments_count = db.Column(db.Integer)  
-    reach = db.Column(db.Integer)
-    percentage = db.Column(db.Float)
-    media_product_type = db.Column(db.String(64))
-    plays = db.Column(db.Integer)
-    saved = db.Column(db.Integer)
-    nome_empresa = db.Column(db.String(64))
-
-    def to_dict(self):
-        return {
-            'id': self.id,  # incluir o id no dicionário
-            'id_empresa': self.id_empresa,
-            'timestamp': self.timestamp,
-            'caption': self.caption,
-            'like_count': self.like_count,
-            'comments_count': self.comments_count,
-            'reach': self.reach,
-            'percentage': self.percentage,
-            'media_product_type': self.media_product_type,
-            'plays': self.plays,
-            'saved': self.saved,
-            'nome_empresa': self.nome_empresa,
-        }
-
-class AnaliseInstagram(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    data_criacao = db.Column(db.String(64))
-    analise = db.Column(db.Text)
-    nome_empresa = db.Column(db.String(64))
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'data_criacao': self.data_criacao,
-            'analise': self.analise,
-            'nome_empresa': self.nome_empresa,
-        }
-    
->>>>>>> 501249601e05b63418fc0ef6d34ebe7a3e6a507b
-
-
-
 
 
 class Resposta(db.Model):
@@ -127,21 +42,12 @@ class Usuario(db.Model, UserMixin):
     data_entrada = db.Column(db.DateTime, default=datetime.utcnow)
     cargo = db.Column(db.String(80), nullable=False)
     status = db.Column(db.String(20), nullable=False)
-<<<<<<< HEAD
     sprint = db.Column(db.String(200))  # Novo campo
     dayling_1 = db.Column(db.String(200))  # Novo campo
     dayling_2 = db.Column(db.String(200))  # Novo campo
     dayling_3 = db.Column(db.String(200))  # Novo campo
     dayling_4 = db.Column(db.String(200))  # Novo campo
     dayling_5 = db.Column(db.String(200))  # Novo campo
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'nome': self.nome,
-            'sobrenome': self.sobrenome,
-            'email': self.email,
-        }
-=======
     sprint = db.Column(db.String(200))
     dayling_1 = db.Column(db.String(200))
     dayling_2 = db.Column(db.String(200))
@@ -167,7 +73,7 @@ class Usuario(db.Model, UserMixin):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
->>>>>>> 94e508a0bac959678b7f81a58db7835536d810a3
+
 
 class OKR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -188,42 +94,13 @@ class KR(db.Model):
     data_inclusao = db.Column(db.DateTime, default=datetime.utcnow)
     okr = db.relationship('OKR', backref='krs')
 
-<<<<<<< HEAD
-class PostInstagram(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    id_empresa = db.Column(db.String(64), index=True)
-    timestamp = db.Column(db.String(64))
-    caption = db.Column(db.String(64))
-    like_count = db.Column(db.Integer)
-    comments_count = db.Column(db.Integer)
-    reach = db.Column(db.Integer)
-    percentage = db.Column(db.Float)
-    media_product_type = db.Column(db.String(64))
-    plays = db.Column(db.Integer)
-    saved = db.Column(db.Integer)
-    nome_empresa = db.Column(db.String(64))
 
-    def to_dicts(self):
-        return {
-            'id': self.id,  # incluir o id no dicionário
-            'id_empresa': self.id_empresa,
-            'timestamp': self.timestamp,
-            'caption': self.caption,
-            'like_count': self.like_count,
-            'comments_count': self.comments_count,
-            'reach': self.reach,
-            'percentage': self.percentage,
-            'media_product_type': self.media_product_type,
-            'plays': self.plays,
-            'saved': self.saved,
-            'nome_empresa': self.nome_empresa,
-        }
-    
+
 class PostsInstagram(db.Model):
     id = db.Column(db.String, primary_key=True)
     id_empresa = db.Column(db.String(64), index=True)
     timestamp = db.Column(db.String(64))
-    caption = db.Column(db.String(64))
+    caption = db.Column(db.String(1000))
     like_count = db.Column(db.Integer)
     comments_count = db.Column(db.Integer)  
     reach = db.Column(db.Integer)
@@ -262,7 +139,7 @@ class AnaliseInstagram(db.Model):
             'analise': self.analise,
             'nome_empresa': self.nome_empresa,
         }
-=======
+
 
 
 
@@ -314,4 +191,3 @@ class TarefaSemanal(db.Model):
 
 
 
->>>>>>> 94e508a0bac959678b7f81a58db7835536d810a3

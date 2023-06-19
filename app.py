@@ -40,6 +40,10 @@ import base64
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from sqlalchemy.orm import Session
+from psycopg2 import errors as pg_errors
+import traceback
+from sqlalchemy.exc import DataError
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv()  # Carrega as variáveis de ambiente do arquivo .env
@@ -48,6 +52,8 @@ url = os.getenv("DATABASE_URL")  # obtém a URL do banco de dados do ambiente
 if url.startswith("postgres://"):
     url = url.replace("postgres://", "postgresql://", 1)  # substitui o primeiro 'postgres://' por 'postgresql://'
 
+class User(UserMixin):
+    pass
 
 app = Flask(__name__)
 app.secret_key = 'Omega801'
@@ -65,10 +71,23 @@ credentials = service_account.Credentials.from_service_account_file(
 # Constrói o serviço de e-mail
 service = build('gmail', 'v1', credentials=credentials)
 
+#################################### LOGIN #########################################
+
+
 # Configuração do gerenciador de login
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def user_loader(email):
+    user = Usuario.query.filter_by(email=email).first()
+    if user is None:
+        return
+
+    user = User()
+    user.id = email
+    return user
 
 @app.route('/')
 @login_required
@@ -78,6 +97,63 @@ def home():
 def convert_string_to_datetime(date_string):
     return datetime.strptime(date_string, '%Y-%m-%d')
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    email = request.form['email']
+    user = Usuario.query.filter_by(email=email).first()
+    if user is None:
+        return abort(401)
+
+    if user.verify_password(request.form['password']):
+        user_auth = User()
+        user_auth.id = user.id  # use user id instead of email
+        login_user(user_auth)
+        return redirect(url_for('home'))
+
+    return abort(401)
+
+
+def verify_password(self, password):
+    if self.password_hash is None:
+        return False
+    return check_password_hash(self.password_hash, password)
+
+
+class User(UserMixin):
+    pass
+
+@login_manager.user_loader
+def user_loader(email):
+    user = Usuario.query.filter_by(email=email).first()
+    if user is None:
+        return
+
+    user = User()
+    user.id = email
+    return user
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
+
+@login_manager.request_loader
+def request_loader(request):
+    user_id = request.form.get('user_id')
+    if user_id is None:
+        return
+    return Usuario.query.get(int(user_id))
+
+##################################################################################
 
 
 #################################### RESULTADO #########################################
@@ -552,6 +628,7 @@ def gerar_macro_acao(id):
         resposta_dict = json.loads(resposta)
         # Verifica se a resposta é uma lista ou um dicionário com a chave 'acoes'
         if isinstance(resposta_dict, list):
+            print("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
             macro_acoes = resposta_dict
         elif 'acoes' in resposta_dict:
             macro_acoes = resposta_dict['acoes']
@@ -573,7 +650,6 @@ def gerar_macro_acao(id):
     return render_template('gerar_macro_acao.html', kr=kr)
 
 
-
 @app.route('/revisar_macro_acoes', methods=['GET', 'POST'])
 @login_required
 def revisar_macro_acoes():
@@ -581,7 +657,7 @@ def revisar_macro_acoes():
         macro_acoes = session.get('macro_acoes')
         kr_id = session.get('kr_id')
         kr = KR.query.get(kr_id)
-
+        print(macro_acoes)
         for acao in macro_acoes:
             # Cria uma nova entrada em MacroAcao para cada ação na resposta
             macro_acao = MacroAcao(
@@ -621,6 +697,7 @@ def refazer_macro_acao(id):
 
     # Carrega a resposta JSON
     resposta_dict = json.loads(resposta)
+    print("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
     # Verifica se a resposta é uma lista ou um dicionário com a chave 'acoes'
     if isinstance(resposta_dict, list):
         macro_acoes = resposta_dict
@@ -1084,7 +1161,7 @@ def send_whatsapp(id, user_id):
         whatsapp_message = analise.analise
 
         headers = {
-            'Authorization': 'Bearer EAAEKuYkpbtsBAD4zieqbSSw3JeyeFULHWlvHTzHuGoKAZBd0l120H0PAZAXF0rzXoGpyTXcrgwwLHsAzwr6qHtWypJ2lBI8zNqGbvVSVF0IcnpLS7cuCLFRwKGpgCDHZCQZAk6rjawKc5U4ZCaYYSebGBMe4j6JjtpPOjnikQ9oep9VhlMzhieXCjOKOzf2S2ddSEtiHEEAZDZD',
+            'Authorization': 'Bearer '+ os.getenv("WHATSAPP_TOKEN"),
             'Content-Type': 'application/json'
         }
         
@@ -1225,8 +1302,6 @@ def atualizar_usuario(id):
     empresas = Empresa.query.all()
     return render_template('atualizar_usuario.html', usuario=usuario, empresas=empresas)
 
-
-
 @app.route('/deletar_usuario/<int:id>', methods=['POST'])
 @login_required
 def deletar_usuario(id):
@@ -1247,10 +1322,10 @@ def get_usuarios(empresa_id):
 
 #############################################################################
 
-
 #################################### POSTS #########################################
 
 @app.route('/cadastrar/post', methods=['POST'])
+@login_required
 def cadastrar_post():
         empresas = Empresa.query.filter(Empresa.vincular_instagram.isnot(None)).all()
 
@@ -1272,6 +1347,7 @@ def cadastrar_post():
 
 
 @app.route('/api/posts', methods=['GET'])
+@login_required
 def api_posts():
     empresa_selecionada = request.args.get('empresa')
     if empresa_selecionada:
@@ -1286,6 +1362,7 @@ def api_posts():
 
 
 @app.route('/verificar_post_existente', methods=['POST'])
+@login_required
 def verificar_post_existente():
     data = request.get_json()
     id = data.get('id')
@@ -1299,6 +1376,7 @@ def verificar_post_existente():
         return jsonify({'exists': True})
     
 @app.route('/delete_all_posts', methods=['POST'])
+@login_required
 def delete_all_posts():
     try:
         num_rows_deleted = db.session.query(PostsInstagram).delete()
@@ -1310,15 +1388,21 @@ def delete_all_posts():
         print(e)
         
 @app.route('/listar/posts', methods=['GET'])
+@login_required
 def listar_posts():
     empresas = Empresa.query.filter(Empresa.vincular_instagram.isnot(None)).all()
     posts = PostsInstagram.query.filter(PostsInstagram.timestamp.isnot(None)).all()
+   
     return render_template('listar_posts.html', posts=posts, empresas=empresas)
 
 @app.route('/analise_posts', methods=['GET', 'POST'])
+@login_required
 def analise_posts():
     try:
         if request.method == 'POST':
+            for field, value in request.form.items():
+                if len(value) > 64:
+                    print(f"Valor muito longo no campo '{field}': {value}")
             posts = PostsInstagram(
                 id=request.form.get('id'),
                 id_empresa=request.form.get('id_empresa'),
@@ -1335,6 +1419,9 @@ def analise_posts():
             )
             db.session.add(posts)
             db.session.commit()
+    except DataError as e:
+        traceback.print_exc()
+        return jsonify({'message': 'Dados inseridos com falha!'}), 201
     except Exception as e:
         print("Exceção ocorreu: ", e)
         traceback.print_exc()
@@ -1638,17 +1725,16 @@ def responder_pergunta(id):
 
     return render_template('responder_pergunta.html', pergunta=pergunta, resposta=resposta, id=id)
 
-
-
 def perguntar_gpt(pergunta, pergunta_id, messages):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + os.getenv("OPENAI_API_KEY")
+        "Authorization": "Bearer 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"
     }
 
     # Adiciona a pergunta atual
-    messages.append({"role": "user", "content": pergunta})
+    messages.append({"role": "user", "content": str(pergunta)})
+
 
     data = {
         "model": "gpt-4",
@@ -1660,19 +1746,17 @@ def perguntar_gpt(pergunta, pergunta_id, messages):
         try:
             response = requests.post(url, headers=headers, data=json.dumps(data))
             response.raise_for_status()
-
             # Adiciona a resposta do modelo à lista de mensagens
             messages.append({"role": "assistant", "content": response.json()['choices'][0]['message']['content']})
-
             return response.json()['choices'][0]['message']['content'], messages
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code in (429, 520, 502, 503):  # Limite de requisições atingido ou erro de servidor
+            print(e)
+            if e.response.status_code in (429, 520):  # Limite de requisições atingido ou erro de servidor
                 print(f"Erro {e.response.status_code} atingido. Aguardando antes de tentar novamente...")
                 time.sleep(backoff_time)  # Aguarda antes de tentar novamente
                 backoff_time *= 2  # Aumenta o tempo de espera
             else:
                 raise
-
 
 #############################################################################
 
@@ -1820,28 +1904,6 @@ def cadastrar_okr():
     empresas = Empresa.query.all()
     return render_template('cadastrar_okr.html', empresas=empresas)
 
-
-@app.route('/atualizar/okr/<int:id>', methods=['GET', 'POST'])
-def atualizar_okr(id):
-    okr = OKR.query.get(id)
-    empresas = Empresa.query.all()
-    if request.method == 'POST':
-        okr.objetivo_1 = request.form['objetivo_1']
-        okr.objetivo_2 = request.form['objetivo_2']
-        okr.objetivo_3 = request.form['objetivo_3']
-        okr.objetivo_4 = request.form['objetivo_4']
-        okr.objetivo_5 = request.form['objetivo_5']
-        db.session.commit()
-        return redirect(url_for('listar_okrs'))
-    return render_template('atualizar_okr.html', okr=okr, empresas=empresas)
-
-
-@app.route('/deletar/okr/<int:id>', methods=['POST'])
-def deletar_okr(id):
-    okr = OKR.query.get(id)
-    db.session.delete(okr)
-    db.session.commit()
-    return redirect(url_for('listar_okrs'))
 
 
 #############################################################################
