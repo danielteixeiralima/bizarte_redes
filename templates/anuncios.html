@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styleLogin.css">
+</head>
+<body>  
+  <script src="loginGoogle.js"></script>
+
+
+  <div class="row2">
+    <div class="col-md-3">
+      <a class="btn btn-outline-dark" href="javascript:checkLoginState()" role="button" style="text-transform:none">
+        <img  />
+        <fb:login-button size="large" class="fbButton" scope="public_profile,email"
+        onlogin="checkLoginState();">
+        Login with Facebook
+      </fb:login-button>
+      </a>
+    </div>
+  </div>
+  
+  <!-- <div class="form-group">
+    <label for="vincular_instagram"></label>
+    <select id="vincular_instagram" name="vincular_instagram"></select>
+  </div>  -->
+
+<select id="empresa" name="empresa">
+  {% for empresa in empresas %}
+      <option value="{{ empresa.id }}">{{ empresa.vincular_anuncio}}</option>
+  {% endfor %}
+</select><br><br>
+<button id="buscar_token" onclick="buscaToken()">Gerar Posts</button>
+<!-- <button id="next_posts" onclick="nextPage()">Próximos Posts</button> -->
+<form class="form-style" method="post" onsubmit="event.preventDefault(); sendPostsToServer();">
+  <input type="submit" value="Cadastrar">
+</form>
+<br><br>
+<table id="tabela_posts" class="styled-table">
+  <thead>
+    <tr>
+      <th>Campanha</th>
+      <th>Grupo do anúncio</th>
+      <th>Anúncio</th>
+      <th>Valor gasto</th>
+      <th>Impressões</th>
+      <th>Landing page views</th>
+      <th>CPM</th>
+      <th>CTR</th>
+      <th>CPC</th>
+    </tr>
+  </thead>
+  <tbody>
+  <!-- Os dados serão preenchidos aqui pelo JavaScript -->
+  </tbody>
+</table>
+
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v16.0&appId=1157520028267131&autoLogAppEvents=1" nonce="Ch3FFFeq"></script>
+  <!-- <div id="icone"/>
+  <div class="row">
+    <div class="col-md-3">
+      <a class="btn btn-outline-dark" href="javascript:signIn()" role="button" style="text-transform:none">
+        <img width="20px" style="margin-bottom:3px; margin-right:5px" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+        Login with Google
+      </a>
+    </div>
+  </div> -->
+  
+  
+
+
+  <script>
+  
+    window.fbAsyncInit = function() {
+      FB.init({
+      appId      : '3311916552453612',
+      cookie     : true,
+      xfbml      : false,
+      version    : 'v17.0',
+      });
+  }
+  function loginStatus(){
+      FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+      });
+  };
+    
+  (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+  }
+  (document, 'script', 'facebook-jssdk'));
+
+  function checkLoginState() {
+      FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+      });
+      }
+
+      
+      var empresas = []
+      var ids = []
+      var token = ''
+      var id = ''
+      var idIG = ''
+      var idsPost = []
+      var listaNomes = []
+      var page = 0;
+      var listaReach = []
+      var nome_empresa = ''
+
+      async function statusChangeCallback(response){
+
+        if(response.status == 'connected'){
+          var empresa = await listaEmpresas();
+          localStorage.setItem('empresa', JSON.stringify(empresa));
+          //var empresa = JSON.parse(localStorage.getItem('empresa'));
+          console.log(empresa)
+          
+         
+          
+          // Cria um array vazio para armazenar os pares de nomes das empresas e tokens
+         
+          //console.log(ids)
+          //console.log(listaEmpresaToken)
+          return empresas
+        }
+
+      }
+
+      function listaEmpresas() {
+        return new Promise((resolve, reject) => {
+          FB.api('me?fields=adaccounts{name}', function(response) {
+            if (response && response.adaccounts && response.adaccounts.data) {
+              const empresas = response.adaccounts.data;
+              // Cria uma lista para armazenar apenas os IDs e outra para armazenar os nomes
+              const ids = empresas.map(empresa => empresa.id);
+              const nomes = empresas.map(empresa => empresa.name);
+              
+              // Armazenar os ids e os nomes no localStorage
+              localStorage.setItem('empresaIds', JSON.stringify(ids));
+              localStorage.setItem('empresaNomes', JSON.stringify(nomes));
+      
+              resolve({ids, nomes});
+            } else {
+              reject('Não foi possível recuperar as empresas.');
+            }
+          });
+        });
+      }
+
+      async function sendPostsToServer() {
+        var listaNomes = JSON.parse(localStorage.getItem('listaNomes'));
+        for (var i = 0; i < listaNomes.length; i++) {
+            var anuncio = listaNomes[i];
+    
+            // Verifique se o post já existe antes de enviá-lo
+            let res = await fetch('/verificar_post_existente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: anuncio.id })
+            });
+    
+            let jsonRes = await res.json();
+    
+            if (!jsonRes.exists) {
+                // O post não existe, envie-o ao servidor
+    
+                // Crie um objeto FormData para segurar os dados do post
+                var formData = new FormData();
+                formData.append('id', anuncio.id)
+                formData.append('id_empresa', anuncio.id_empresa);
+                formData.append('valor', anuncio.valor);
+                formData.append('impressoes', anuncio.impressoes);
+                formData.append('landing', anuncio.landing);
+                formData.append('cpm', anuncio.cpm);
+                formData.append('ctr', anuncio.ctr);
+                formData.append('ctc', anuncio.ctc);
+            
+    
+                // Faça a solicitação POST para o servidor
+                let response = await fetch('/analise_anuncios', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                if (response.ok) {
+                    console.log('Post enviado com sucesso para o servidor');
+                    console.log(response)
+                } else {
+                    console.log('Erro ao enviar o post para o servidor:', response.status, response.statusText);                  
+                }
+            } else {
+                console.log(`Anúncio com id ${anuncio.id} já existe.`);
+            }
+        }
+    }
+
+      statusChangeCallback(response).then(() => {
+        buscaToken();
+      });
+      async function buscaToken(){
+        clearTable();
+        listaNomes = JSON.parse(localStorage.getItem('listaNomes')) || [];
+        page = 0;
+        let selectElement = document.getElementById('empresa');
+        nome_empresa = selectElement.options[selectElement.selectedIndex].text;
+        for (var i = 0; i < empresas.length; i++) {
+          if(nome_empresa == empresas[i][0]){
+            token = empresas[i][1];
+            id = ids[i].id;
+          }
+        }
+      
+      
+        // Após buscar o token e ter o id da empresa, chame a função getInsights.
+        getInsights(id);
+      }
+  
+      function getInsights() {
+        return new Promise((resolve, reject) => {
+          var selectElement = document.getElementById('empresa');
+          var selectedEmpresaNome = selectElement.options[selectElement.selectedIndex].text;
+          var empresaNomes = JSON.parse(localStorage.getItem('empresaNomes'));
+          var empresaIds = JSON.parse(localStorage.getItem('empresaIds'));
+          var empresaIndex = empresaNomes.indexOf(selectedEmpresaNome);
+          var promises = []
+          if (empresaIndex === -1) {
+            reject("Empresa não encontrada na lista.");
+            return;
+          }
+      
+          var empresaId = empresaIds[empresaIndex];
+      
+          campanhas().then(adsData => {
+            var promises = adsData.map((adData, index) => {
+              return Promise.all([
+                postPromises = new Promise((resolve, reject) => {
+                  FB.api(adData.adId + '/insights?fields=spend', function (response) {
+                    resolve(response);
+                  });
+                }),
+                new Promise((resolve, reject) => {
+                  FB.api(adData.adId + '/insights?fields=impressions', function (response) {
+                    resolve(response);
+                  });
+                }),
+                new Promise((resolve, reject) => {
+                  FB.api(adData.adId + '/insights?fields=cpc,cpm,ctr', function (response) {
+                    resolve(response);
+                  });
+                }),
+                new Promise((resolve, reject) => {
+                  FB.api(adData.adId + '/insights?fields=actions', function (response) {
+                    resolve(response);
+                  });
+                }),
+                adData
+              ]);
+            });
+
+            Promise.all(promises).then((responses) => {
+              var insightsArray = responses.map((responseArray, index) => {
+                var adData = adsData[index]; // Get corresponding adData based on index
+      
+                var spend = responseArray[0]?.data[0]?.spend || 0;
+                var impressions = responseArray[1]?.data[0]?.impressions || 0;
+                var cpc = responseArray[2]?.data[0]?.cpc || 0;
+                var cpm = responseArray[2]?.data[0]?.cpm || 0;
+                var ctr = responseArray[2]?.data[0]?.ctr || 0;
+                var landing_page_views = responseArray[3]?.data[0]?.actions?.find(action => action.action_type === 'landing_page_view')?.value || 0;
+      
+                var nome_campanha = adData?.nome_campanha || "";
+                var nome_anuncio = adData?.nome_anuncio || "";
+                var nome_grupo = adData?.nome_grupo || "";
+      
+                return { nome_campanha, nome_grupo, nome_anuncio, spend, impressions, landing_page_views, cpm, ctr, cpc };
+              });
+              
+              localStorage.setItem('listaInsights', JSON.stringify(insightsArray));
+              populateTable();
+              resolve();
+            }).catch(reject);
+          }).catch(reject);
+        });
+      }
+
+
+    function campanhas() {
+      return new Promise((resolve, reject) => {
+          // Recupera a empresa selecionada no campo select
+          var selectElement = document.getElementById('empresa');
+          var selectedEmpresaNome = selectElement.options[selectElement.selectedIndex].text;
+  
+          // Obtem as listas de nomes e IDs das empresas do localStorage
+          var empresaNomes = JSON.parse(localStorage.getItem('empresaNomes'));
+          var empresaIds = JSON.parse(localStorage.getItem('empresaIds'));
+  
+          // Encontra o índice da empresa selecionada na lista de nomes
+          var empresaIndex = empresaNomes.indexOf(selectedEmpresaNome);
+  
+          if(empresaIndex === -1) {
+              reject("Empresa não encontrada na lista.");
+              return;
+          }
+  
+          // Obtem o ID correspondente
+          var empresaId = empresaIds[empresaIndex];
+          FB.api(empresaId + '/campaigns?fields=name,ads{id,name,adset{id,name}}', function(response) {
+              if(response && response.data) {
+                  const campanhas = response.data;
+    
+                  // Cria uma lista para armazenar os dados de cada anúncio
+                  let adsData = [];
+  
+                  // Itera sobre as campanhas para pegar os dados dos anúncios
+                  for(let i = 0; i < campanhas.length; i++) {
+                      if(campanhas[i].ads && campanhas[i].ads.data) {
+                          for(let j = 0; j < campanhas[i].ads.data.length; j++) {
+                              let ad = campanhas[i].ads.data[j];
+                              adsData.push({
+                                  nome_campanha: campanhas[i].name,
+                                  adId: ad.id,
+                                  nome_anuncio: ad.name,
+                                  nome_grupo: ad.adset.name
+                              });
+                          }
+                      }
+                  }
+  
+                  // Armazena os dados no localStorage
+                  localStorage.setItem('adsData', JSON.stringify(adsData));
+      
+                  resolve(adsData);
+              } else {
+                  reject('Não foi possível recuperar as campanhas.');
+              }
+          });
+      });
+  }
+
+  function populateTable() {
+    clearTable();
+    var listaInsights = JSON.parse(localStorage.getItem('listaInsights'));
+    var table = document.getElementById('tabela_posts').getElementsByTagName('tbody')[0];
+  
+    for (var i = 0; i < listaInsights.length; i++) {
+      var newRow = table.insertRow(table.length);
+      var cell1 = newRow.insertCell(0);
+      var cell2 = newRow.insertCell(1);
+      var cell3 = newRow.insertCell(2);
+      var cell4 = newRow.insertCell(3);
+      var cell5 = newRow.insertCell(4);
+      var cell6 = newRow.insertCell(5);
+      var cell7 = newRow.insertCell(6);
+      var cell8 = newRow.insertCell(7);
+      var cell9 = newRow.insertCell(8);
+  
+      cell1.textContent = listaInsights[i].nome_campanha;
+      cell2.textContent = listaInsights[i].nome_grupo;
+      cell3.textContent = listaInsights[i].nome_anuncio;
+      cell4.textContent = listaInsights[i].spend;
+      cell5.textContent = listaInsights[i].impressions;
+      cell6.textContent = listaInsights[i].landing_page_views;
+      cell7.textContent = listaInsights[i].cpm;
+      cell8.textContent = listaInsights[i].ctr;
+      cell9.textContent = listaInsights[i].cpc;
+    }
+  }
+  
+  function clearTable() {
+    var table = document.getElementById('tabela_posts').getElementsByTagName('tbody')[0];
+    while (table.hasChildNodes()) {  
+      table.removeChild(table.firstChild);
+    }
+  }
+
+  </script>
+  <!-- Minified CSS and JS -->
+  <link   rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+          crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+          crossorigin="anonymous">
+  </script>
+
+
+
+</div>
+</html>
+
+
+
+  {% endblock %}
+

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contas de Anúncios</title>
+  <style>
+    /* Adicione seus estilos CSS aqui, se necessário */
+  </style>
+</head>
+<body>
+  <br><br>
+  <button id="voltar" onclick="window.location.href='/anuncios'">Voltar</button>
+
+  <textarea id="analise-content" readonly style="width: 100%; height: 80vh;"></textarea>
+
+  <script>
+  window.onload = function() {
+    // Recuperar a análise do localStorage
+    var analise = JSON.parse(localStorage.getItem('analise'));
+
+    // Formatando a análise como uma string JSON para exibição
+    var analiseAsString = JSON.stringify(analise, null, 2);
+
+    // Substituir a representação literal da quebra de linha pela quebra de linha real
+    var formattedAnalise = analiseAsString.replace(/\\n/g, '\n');
+
+    // Colocar a análise formatada no elemento 'analise-content'
+    document.getElementById('analise-content').value = formattedAnalise;
+  };
+  </script>
+
+{% endblock %}
+</body>
+</html>
