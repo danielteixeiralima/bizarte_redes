@@ -4,6 +4,7 @@
     <h1>Cadastrar Empresa</h1>
     <script>
         var empresa = JSON.parse(localStorage.getItem('empresa'));
+        var empresaNomes = JSON.parse(localStorage.getItem('empresaNomes'));
         
         var empresas = [];
         for (var i = 0; i < empresa.length; i++) {
@@ -52,6 +53,10 @@
             <select id="vincular_instagram" name="vincular_instagram"></select>
         </div>
         <div class="form-group">
+            <label for="vincular_anuncio">Vincular anúncio do Instagram:</label>
+            <select id="vincular_anuncio" name="vincular_anuncio"></select>
+        </div>
+        <div class="form-group">
             <input type="submit" value="Cadastrar">
         </div>
     </form>
@@ -64,6 +69,17 @@
                 var opt = document.createElement('option');
                 opt.value = empresas[i];
                 opt.innerHTML = empresas[i];
+                select.appendChild(opt);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var select = document.getElementById('vincular_anuncio');
+            empresaNomes.unshift("");
+            for(var i = 0; i < empresaNomes.length; i++) {
+                var opt = document.createElement('option');
+                opt.value = empresaNomes[i];
+                opt.innerHTML = empresaNomes[i];
                 select.appendChild(opt);
             }
         });
