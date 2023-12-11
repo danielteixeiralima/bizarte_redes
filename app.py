@@ -6,6 +6,7 @@ import time
 import os
 from flask_migrate import Migrate
 from flask import jsonify
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 import pandas as pd
 import traceback
 from flask import current_app
@@ -54,6 +55,12 @@ def home():
 def listar_empresas():
     empresas = Empresa.query.all()
     return render_template('listar_empresas.html', empresas=empresas)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
 @app.route('/cadastrar/empresa', methods=['GET', 'POST'])
 def cadastrar_empresa():
